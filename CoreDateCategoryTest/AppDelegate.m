@@ -37,7 +37,7 @@
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Entity"];
     NSError *error = nil;
     NSArray *array = [self.managedObjectContext executeFetchRequest:request error:&error];
-
+    
     if (!error ) {
         if ([array count] < 1) {
             
@@ -51,40 +51,41 @@
             
             [self.managedObjectContext save:&error];
             
-           
+            
         } 
-    
-    NSPredicate *evenPrediacte = [NSPredicate predicateWithFormat:@"self.date.evenNumber == YES"];
-    NSPredicate *oddPredicate = [NSPredicate predicateWithFormat:@"self.date.evenNumber == NO"];
-    request.predicate = evenPrediacte;
-    NSArray *even = [self.managedObjectContext executeFetchRequest:request error:&error];
-    if (error) {
-        NSLog(@"error: %@", error);
-    }
-    
-    request.predicate = oddPredicate;
-    error = nil;
-    NSArray *odd = [self.managedObjectContext executeFetchRequest:request error:&error];
-    if (error) {
-        NSLog(@"error: %@", error);
-    }
-    
-    NSLog(@"even (Core Data): %d", [even count]);
-    NSLog(@"odd (Core Data): %d", [odd count]);
-    NSLog(@"all: %d", [array count]);
-    
-    NSMutableArray *newArray = [NSMutableArray array];
-    for (NSInteger i = 0; i < 500; i++) {
-        NSDate *date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)i];
-        [newArray addObject:date]; 
-    }
-    
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self.evenNumber == YES"];
-    
-    [newArray filterUsingPredicate:predicate];
-    NSLog(@"even (array): %d", [newArray count]);
-    
-    
+        
+        NSPredicate *evenPrediacte = [NSPredicate predicateWithFormat:@"self.date.evenNumber == YES"];
+        NSPredicate *oddPredicate = [NSPredicate predicateWithFormat:@"self.date.evenNumber == NO"];
+        request.predicate = evenPrediacte;
+        NSArray *even = [self.managedObjectContext executeFetchRequest:request error:&error];
+        if (error) {
+            NSLog(@"error: %@", error);
+        }
+        
+        request.predicate = oddPredicate;
+        error = nil;
+        NSArray *odd = [self.managedObjectContext executeFetchRequest:request error:&error];
+        if (error) {
+            NSLog(@"error: %@", error);
+        }
+        
+        NSLog(@"even (Core Data): %d", [even count]);
+        NSLog(@"odd (Core Data): %d", [odd count]);
+        NSLog(@"all: %d", [array count]);
+        
+        NSMutableArray *newArray = [NSMutableArray array];
+        for (NSInteger i = 0; i < 500; i++) {
+            NSDate *date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)i];
+            [newArray addObject:date]; 
+        }
+        
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self.evenNumber == YES"];
+        
+        [newArray filterUsingPredicate:predicate];
+        NSLog(@"even (array): %d", [newArray count]);
+        even = [array filteredArrayUsingPredicate:evenPrediacte];
+        NSLog(@"even (prefetched from core data): %d", [even count]);
+        
     }
     
     
@@ -126,8 +127,8 @@
     NSManagedObjectContext *managedObjectContext = self.managedObjectContext;
     if (managedObjectContext != nil) {
         if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error]) {
-             // Replace this implementation with code to handle the error appropriately.
-             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
+            // Replace this implementation with code to handle the error appropriately.
+            // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
         } 
